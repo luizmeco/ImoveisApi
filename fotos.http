@@ -1,0 +1,71 @@
+@baseUrl = http://localhost:8080
+@imovelId = 1
+@fotoId = 5
+
+### Enviar foto para um imóvel
+# Troque o caminho pelo de uma imagem existente junto a este arquivo.
+POST {{baseUrl}}/fotos
+Content-Type: multipart/form-data; boundary=FotoImovelBoundary
+
+--FotoImovelBoundary
+Content-Disposition: form-data; name="arquivo"; filename="foto-teste.jpg"
+Content-Type: image/jpeg
+
+< ./foto-teste.jpg
+--FotoImovelBoundary
+Content-Disposition: form-data; name="imovelId"
+
+{{imovelId}}
+--FotoImovelBoundary
+Content-Disposition: form-data; name="ordem"
+
+1
+--FotoImovelBoundary--
+
+### Listar todas as fotos
+GET {{baseUrl}}/fotos
+Accept: application/json
+
+### Listar fotos de um imóvel
+GET {{baseUrl}}/fotos?imovelId={{imovelId}}
+Accept: application/json
+
+### Consultar metadados de uma foto
+GET {{baseUrl}}/fotos/{{fotoId}}
+Accept: application/json
+
+### Baixar/visualizar o arquivo da foto
+GET {{baseUrl}}/fotos/{{fotoId}}/arquivo
+
+### Editar capa e ordem
+PUT {{baseUrl}}/fotos/{{fotoId}}
+Content-Type: multipart/form-data; boundary=FotoImovelBoundary
+
+--FotoImovelBoundary
+Content-Disposition: form-data; name="capa"
+
+false
+--FotoImovelBoundary
+Content-Disposition: form-data; name="ordem"
+
+2
+--FotoImovelBoundary--
+
+### Substituir o arquivo da foto
+# Troque o caminho e o tipo MIME se usar outro formato de imagem.
+PUT {{baseUrl}}/fotos/{{fotoId}}
+Content-Type: multipart/form-data; boundary=FotoImovelBoundary
+
+--FotoImovelBoundary
+Content-Disposition: form-data; name="arquivo"; filename="foto-substituta.jpg"
+Content-Type: image/jpeg
+
+< ./foto-substituta.jpg
+--FotoImovelBoundary--
+
+### Tornar a foto a capa do imóvel
+PUT {{baseUrl}}/fotos/{{fotoId}}/capa
+
+### Excluir a foto e o arquivo
+# Esta operação é destrutiva. Execute apenas quando quiser remover a foto.
+DELETE {{baseUrl}}/fotos/{{fotoId}}

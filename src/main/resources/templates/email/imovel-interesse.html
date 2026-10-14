@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="margin: 0; padding: 24px; font-family: Arial, sans-serif; color: #202124;">
+    <div style="max-width: 640px; margin: 0 auto;">
+        <h2 style="color: #174c3c;">Olá, <span th:text="${nome}">cliente</span>!</h2>
+        <p>Obrigado pelo seu interesse. A equipe da imobiliária terá prazer em ajudar você a conhecer este imóvel.</p>
+
+        <h3 th:text="${titulo}">Título do imóvel</h3>
+        <p th:text="${descricao}">Descrição do imóvel</p>
+
+        <ul>
+            <li>Finalidade: <span th:text="${finalidade}"></span></li>
+            <li>Status: <span th:text="${status}"></span></li>
+            <li>Preço de venda: <span th:text="${precoVenda}"></span></li>
+            <li>Preço de aluguel: <span th:text="${precoAluguel}"></span></li>
+            <li>Dormitórios: <span th:text="${dormitorios}"></span></li>
+            <li>Banheiros: <span th:text="${banheiros}"></span></li>
+            <li>Garagem: <span th:text="${garagem}"></span></li>
+            <li>Área total: <span th:text="${areaTotal}"></span></li>
+            <li>Área construída: <span th:text="${areaConstruida}"></span></li>
+            <li>Endereço: <span th:text="${endereco}"></span>, <span th:text="${numero}"></span></li>
+            <li>Complemento: <span th:text="${complemento}"></span></li>
+            <li>CEP: <span th:text="${cep}"></span></li>
+            <li>Características: <span th:text="${caracteristicas}"></span></li>
+        </ul>
+
+        <p><strong>Sua mensagem:</strong> <span th:text="${mensagem}"></span></p>
+        <p>Em breve entraremos em contato pelo telefone <span th:text="${telefone}"></span> ou pelo e-mail <span th:text="${email}"></span>.</p>
+        <p>Atenciosamente,<br>Equipe da imobiliária</p>
+    </div>
+</body>
+</html>
