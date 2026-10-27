@@ -1,0 +1,39 @@
+
+Respostas dos exercícios de aula:
+
+1 -> 
+    - Autenticação é a verificação de quem é você e se tem os dados válidos para acesso ao 
+    sistema por exemplo valida o token JWT e verifica os dados que nele existem.
+
+    - Autorização é o que você pode fazer no sistema por exemplo verificar o seu nível de acesso
+    nos dados existentes no token JWT e conceder acesso somente a rotas que o seu nível de acesso
+    permite.
+
+2 ->
+    - Stateful é uma aplicação que guarda os dados para interação com o servidor, por exemplo
+    uma aplicação que trabalha com a autenticação armazenada no cache do navegador.
+
+    - Stateless é uma aplicação que em todas as requisições para o servidor vai enviar todas os
+    dados necessários para autenticação, por exemplo uma aplicação que trabalha uma autenticação
+    usando JWT.
+
+3 ->
+    Falando de sintaxe temos um token divido em 3 partes separadas por ( . ) 
+    "Header.Payload.Signature":
+
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 . 
+        eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ . 
+        SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+    Cada bloco é uma string codificada em Base64Url.
+    O Header e o Payload não são criptografados, apenas codificados. 
+    Qualquer pessoa pode ler o conteúdo deles decodificando a string.
+
+    Semântica:
+        Cabeçalho (Header): Define os metadados do token. Ele avisa ao sistema como ler e 
+            validar o restante do arquivo.
+        Payload: Contém  as informações sobre a entidade (usuário) e dados adicionais que 
+            você deseja transmitir.
+        Assinatura (Signature): É a garantia de integridade e autenticidade do token. 
+            Ela serve para provar que o token foi emitido por você e que ninguém alterou o 
+            Payload no caminho.

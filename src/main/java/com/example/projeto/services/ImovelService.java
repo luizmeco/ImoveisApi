@@ -39,6 +39,15 @@ public class ImovelService {
         return imovelRepository.save(imovel);
     }
 
+    public ImovelModel updateStatus(Integer id, String status) {
+        ImovelModel imovel = find(id);
+        if (imovel == null) {
+            return null;
+        }
+        imovel.setStatus(status);
+        return imovelRepository.save(imovel);
+    }
+
     public boolean delete(Integer id) {
         if (!imovelRepository.existsById(id)) {
             return false;
