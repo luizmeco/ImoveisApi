@@ -40,6 +40,10 @@ public class JwtService {
         Date now = new Date();
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("tipo", userDetails.getAuthorities().stream()
+                        .findFirst()
+                        .map(authority -> authority.getAuthority().replaceFirst("^ROLE_", ""))
+                        .orElse(""))
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationMs))
                 .signWith(signingKey)

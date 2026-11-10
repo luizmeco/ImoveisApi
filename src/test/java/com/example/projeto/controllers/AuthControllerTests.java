@@ -39,11 +39,27 @@ class AuthControllerTests {
     @Test
     void registerAcceptsRequestedRoleAndReturnsEmptyOkResponse() {
         var response = controller.register(new RegisterRequest(
-                "Teste", "teste@example.com", "123", "ADMIN"));
+                "Teste", "teste@example.com", "123", "USER"));
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
-        verify(userService).register("Teste", "teste@example.com", "123", "ADMIN");
+        verify(userService).register("Teste", "teste@example.com", "123", "USER");
+    }
+
+    @Test
+    void publicRegisterCannotCreatePrivilegedUsers() {
+        var response = controller.register(new RegisterRequest(
+                "Teste", "teste@example.com", "123", "ADMIN"));
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void registerNormalizesClientAliasToUserRole() {
+        controller.register(new RegisterRequest(
+                "Teste", "teste@example.com", "123", "CLIENTE"));
+
+        verify(userService).register("Teste", "teste@example.com", "123", "USER");
     }
 
     @Test
@@ -64,6 +80,7 @@ class AuthControllerTests {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("jwt-token", response.getBody().token());
+        assertEquals("ADMINISTRADOR", response.getBody().tipo());
     }
 
     @Test
@@ -95,11 +112,11 @@ class AuthControllerTests {
         mockMvc.perform(post("/public/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Teste","email":"teste@example.com","password":123,"role":"ADMIN"}
+                                {"nome":"Teste","email":"teste@example.com","password":123,"role":"USER"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
-        verify(userService).register("Teste", "teste@example.com", "123", "ADMIN");
+        verify(userService).register("Teste", "teste@example.com", "123", "USER");
 
         mockMvc.perform(post("/public/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +124,8 @@ class AuthControllerTests {
                                 {"email":"teste@example.com","password":"123"}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"token\":\"jwt-token\"}", true));
+                .andExpect(content().json(
+                        "{\"token\":\"jwt-token\",\"tipo\":\"ADMINISTRADOR\"}", true));
         verify(authenticationManager).authenticate(argThat(token ->
                 token.getPrincipal().equals("teste@example.com")
                         && token.getCredentials().equals("123")));

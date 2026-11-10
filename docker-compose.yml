@@ -25,6 +25,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/projetoimobiliaria?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-localroot}
+      APP_SEED_ENABLED: ${APP_SEED_ENABLED:-false}
       JWT_SECRET: ${JWT_SECRET:-bG9jYWwtb25seS1jaGFuZ2UtdGhpcy1qd3Qtc2VjcmV0LWJlZm9yZS1kZXBsb3lpbmc=}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080,http://localhost:5173,http://127.0.0.1:5173}
     ports:

@@ -17,6 +17,7 @@ import com.example.projeto.dtos.AuthResponse;
 import com.example.projeto.dtos.LoginRequest;
 import com.example.projeto.dtos.RegisterRequest;
 import com.example.projeto.models.UserModel;
+import com.example.projeto.models.UserRole;
 import com.example.projeto.security.JwtService;
 import com.example.projeto.services.UserService;
 
@@ -44,7 +45,11 @@ public class AuthController {
                 || !StringUtils.hasText(request.role())) {
             return ResponseEntity.badRequest().build();
         }
-        userService.register(request.nome(), request.email(), request.password(), request.role());
+        if (!"USER".equalsIgnoreCase(request.role().trim())
+                && !"CLIENTE".equalsIgnoreCase(request.role().trim())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        userService.register(request.nome(), request.email(), request.password(), UserRole.USER.name());
         return ResponseEntity.ok().build();
     }
 
@@ -62,7 +67,7 @@ public class AuthController {
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
-            return ResponseEntity.ok(new AuthResponse(jwtService.generateToken(userDetails)));
+            return ResponseEntity.ok(new AuthResponse(jwtService.generateToken(userDetails), user.getTipo()));
         } catch (BadCredentialsException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

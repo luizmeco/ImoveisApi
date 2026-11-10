@@ -2,10 +2,15 @@ package com.example.projeto.models;
 
 public enum UserRole {
     ADMINISTRADOR,
-    CORRETOR;
+    CORRETOR,
+    USER;
 
     public String authority() {
-        return "ROLE_" + (this == ADMINISTRADOR ? "ADMIN" : "CORRETOR");
+        return switch (this) {
+            case ADMINISTRADOR -> "ROLE_ADMIN";
+            case CORRETOR -> "ROLE_CORRETOR";
+            case USER -> "ROLE_USER";
+        };
     }
 
     public static UserRole fromValue(String value) {
@@ -16,6 +21,7 @@ public enum UserRole {
         return switch (value.trim().toUpperCase()) {
             case "ADMIN", "ADMINISTRADOR" -> ADMINISTRADOR;
             case "CORRETOR" -> CORRETOR;
+            case "USER", "CLIENTE" -> USER;
             default -> throw new IllegalArgumentException("Perfil de usuário inválido.");
         };
     }

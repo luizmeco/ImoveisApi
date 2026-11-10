@@ -17,7 +17,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,6 +28,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+
+    @Bean
+    FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(jwtAuthenticationFilter);
+        registration.setEnabled(false);
+        return registration;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -38,12 +50,12 @@ public class SecurityConfiguration {
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint((request, response, exception) ->
                                 response.sendError(401, "Unauthorized"))
-                        .accessDeniedHandler((request, response, exception) ->
-                                response.sendError(403, "Forbidden")))
+                        .accessDeniedHandler(accessDeniedHandler()))
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/imoveis", "/imoveis/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/imoveis/sabermais/*").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/imoveis/*/status")
                                 .hasAnyRole("ADMIN", "CORRETOR")
                         .requestMatchers(HttpMethod.POST, "/imoveis").hasRole("ADMIN")
@@ -63,6 +75,10 @@ public class SecurityConfiguration {
                 .build();
     }
 
+    AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, exception) -> response.setStatus(HttpStatus.FORBIDDEN.value());
+    }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource(
             @Value("${app.cors.allowed-origins}") String allowedOrigins) {
@@ -70,7 +86,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .toList());
-        configuration.setAllowedMethods(List.of("GET", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
