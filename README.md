@@ -79,3 +79,33 @@ Fluxo sugerido com Postman:
 A rota `POST /imoveis/sabermais/{id}` é pública; o envio efetivo do e-mail depende de credenciais SMTP válidas. A rota pública de cadastro, quando usada, só aceita o perfil `USER`; criação de administradores segue restrita ao administrador já autenticado.
 
 Não envie tokens de ambientes reais a sites externos para decodificá-los. O payload de um JWT é codificado, não criptografado.
+
+## Ofertas, contratos e favoritos
+
+As entidades `ofertas`, `contratos` e `favoritos` são criadas/atualizadas pelo Hibernate (`ddl-auto=update`) ao iniciar a API. A criação de oferta e a listagem de ofertas/contratos usam o usuário do JWT; nunca aceite um `usuarioId` enviado pelo navegador.
+
+Todas as rotas abaixo exigem `Authorization: Bearer <token>`:
+
+| Método | Rota | Perfil | Uso |
+| --- | --- | --- | --- |
+| `POST` | `/ofertas` | USER | `{"imovelId":1,"tipoOferta":"VENDA","valorProposto":500000,"mensagem":"..."}` |
+| `GET` | `/ofertas` | USER, CORRETOR, ADMIN | Usuário vê as próprias ofertas; equipe vê todas |
+| `PATCH` | `/ofertas/{id}/status` | CORRETOR, ADMIN | Aceita com `{"status":"ACEITA"}` ou recusa com `{"status":"RECUSADA"}` |
+| `GET` | `/contratos` | USER, CORRETOR, ADMIN | Usuário vê os próprios contratos; equipe vê todos |
+| `PATCH` | `/contratos/{id}/aprovar` | ADMIN | Libera o contrato para assinatura |
+| `PATCH` | `/contratos/{id}/recusar` | ADMIN | Recusa e libera o imóvel |
+| `PATCH` | `/contratos/{id}/cancelar` | ADMIN | Cancela e libera o imóvel |
+| `PATCH` | `/contratos/{id}/assinar` | USER | Assina o contrato do próprio cliente |
+| `GET` | `/favoritos` | USER | Lista os imóveis favoritos |
+| `POST` | `/favoritos` | USER | Adiciona com `{"imovelId":1}` |
+| `DELETE` | `/favoritos/{imovelId}` | USER | Remove um favorito |
+
+O aceite reserva o imóvel e coloca outras ofertas pendentes em espera. A assinatura altera o imóvel para `ALUGADO` ou `VENDIDO` e recusa as ofertas em espera. A recusa/cancelamento do contrato libera o imóvel. Respostas de regra de negócio usam HTTP `409`. A aprovação/recusa/cancelamento tenta notificar o cliente por e-mail; configure SMTP para habilitar o envio. O contrato atualmente registra os estados e datas, mas ainda não gera um arquivo PDF.
+
+### Demonstrar o fluxo
+
+1. Entre como administrador e cadastre um cliente e um corretor em `/users` ou no painel do front.
+2. Entre como cliente, abra um imóvel disponível, envie uma oferta e confira-a em “Minhas ofertas”.
+3. Entre como corretor e aceite a oferta. Isso cria o contrato pendente de aprovação.
+4. Entre como administrador, aprove o contrato.
+5. Volte ao cliente e assine o contrato em “Meus contratos”. O imóvel muda para alugado ou vendido.
