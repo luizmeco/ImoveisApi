@@ -48,7 +48,7 @@ docker compose down
 
 Para apagar também os dados do banco, use `docker compose down --volumes`. Essa ação é irreversível.
 
-As credenciais e a chave JWT padrão são somente para desenvolvimento local. Podem ser substituídas por variáveis de ambiente ou por um arquivo `.env` nesta pasta: `MYSQL_ROOT_PASSWORD`, `JWT_SECRET` e `CORS_ALLOWED_ORIGINS`. As origens padrão liberadas para leitura pela aplicação local são as portas `8080` (front Docker) e `5173` (Vite). Não reutilize os valores locais em produção. O envio de e-mails também depende da configuração SMTP da aplicação.
+As credenciais e a chave JWT padrão são somente para desenvolvimento local. Podem ser substituídas por variáveis de ambiente ou por um arquivo `.env` nesta pasta: `MYSQL_ROOT_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`, `MAIL_USERNAME` e `MAIL_PASSWORD`. O Compose encaminha as duas últimas para o Spring como `SPRING_MAIL_USERNAME` e `SPRING_MAIL_PASSWORD`; mantenha o `.env` fora do Git. As origens padrão liberadas para leitura pela aplicação local são as portas `8080` (front Docker) e `5173` (Vite). Não reutilize os valores locais em produção.
 
 ## Executar a API e o front juntos
 
